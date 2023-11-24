@@ -1,0 +1,15 @@
+0,Salir,salir
+1,Sumatoria del vector,sumatoria
+2,Promedio del vector,promedio
+3,Moda del vector,moda
+4,Contar elementos del vector,contar
+5,Crear archivo,crearArchivo
+6,Agregar texto a archivo,agregarTexto
+7,Contar palabras,conteoPalabras
+8,Preparar datos para índice invertido,prepDatos
+9,Crear índice invertido,crearIndice
+10,LLamar buscador,llamarBuscador
+11,Crear sistema de directorio basado en árbol,directorioArbol
+12,Crear sistema de directorio basado en lista circular,directorioLista
+13,Procesamiento gráfico,grafico
+14,gen1,generico

@@ -1,0 +1,4 @@
+admin;sumatoria,promedio,moda,contar,crearArchivo,agregarTexto,conteoPalabras,prepDatos,crearIndice,llamarBuscador,directorioArbol,directorioLista,grafico,generico
+general;sumatoria,promedio,moda,contar
+rookie;sumatoria,contar
+mor;moda,crearArchivo,conteoPalabras,generico
