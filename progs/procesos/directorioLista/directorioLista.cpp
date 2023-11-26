@@ -8,6 +8,7 @@ string obtenerDirBase(const string& path);
 bool validarArchivo(const string& path);
 void crearDirectorioBase(const string& dirbase, const map<string, vector<string>>& directoriosConArchivos);
 map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path);
+void crearEnlaceSimbolico(const std::string& origen, const std::string& destino);
 
 int main(int argc, char* argv[]){
     system("clear");
@@ -25,9 +26,14 @@ int main(int argc, char* argv[]){
     map<string, vector<string>> directoriosConArchivos = obtenerDirectoriosConArchivos(texto);
     
     crearDirectorioBase(obtenerdirBase, directoriosConArchivos);
-    
-    string comandoLn = "ln -s " + obtenerdirBase + "/" + vectordeDirs.front() + " " + obtenerdirBase + "/" + vectordeDirs.back();
-    system(comandoLn.c_str());
+
+    std::string dirfinal = obtenerdirBase + "/" + vectordeDirs.back();
+    std::string dirinicial = obtenerdirBase + "/" + vectordeDirs.front(); 
+
+    // Crear enlace simbólico desde dir4 a dir1
+    crearEnlaceSimbolico(dirinicial, dirfinal + "/enlace_a_" + vectordeDirs.front());
+
+
 }
 
 
@@ -164,4 +170,14 @@ map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path) {
     }
 
     return directoriosConArchivos;
+}
+
+void crearEnlaceSimbolico(const std::string& origen, const std::string& destino) {
+    try {
+        // Crear enlace simbólico
+        fs::create_symlink(origen, destino);
+        std::cout << "Enlace simbólico creado: " << destino << " -> " << origen << std::endl;
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Error al crear el enlace simbólico: " << e.what() << std::endl;
+    }
 }
