@@ -15,6 +15,9 @@
 #include <algorithm>
 #include <mutex>
 #include <chrono>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 using namespace std;
 namespace fs = filesystem;

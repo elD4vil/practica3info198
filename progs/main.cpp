@@ -138,7 +138,7 @@ int main(int argc, char **argv){
         }
         else if(menu[opc] == "directorioArbol" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
 
-            string directorioArbol = "./procesos/directorioArbol/app ";
+            string directorioArbol = "gnome-terminal -- bash -c './procesos/directorioArbol/app; exec bash'";
             system(directorioArbol.c_str());
 
         }
