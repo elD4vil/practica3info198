@@ -1,5 +1,6 @@
-dirbase=../../../files/baseLista
+dirbase=../../../files/baseLista/
 dirs=dir1;dir2;dir3;dir4
 dir1=file1;file2
 dir2=file3
+dir3=file4
 dir4=file5;file6;file7
