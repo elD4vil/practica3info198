@@ -286,3 +286,80 @@ vector<string> txtFile(const char* pathIn, const char* extension){
 
     return txtFiles;
 }
+
+bool validarExtension(string ext, string path){
+
+    size_t dotIndex = path.find_last_of('.');
+
+    if (dotIndex == string::npos || path.substr(dotIndex + 1) != ext) {
+        cout << "El archivo no tiene la extensión correcta (" << ext << ").\n";
+        return false;
+    }
+
+    return true;
+}
+
+bool validarExistenciaArchivo(string path){
+    if (!fs::exists(path)) {
+        cout << "El archivo con path " << path << " no existe.\n";
+        return false;
+    }
+    return true;
+}
+
+bool validarFormatoMensaje(const json& mensaje) {
+
+    if (!mensaje.contains("dirBase") || !mensaje["dirBase"].is_string()) {
+        cerr << "Error: La clave 'dirBase' no está presente o no es de tipo string.\n";
+        return false;
+    }
+
+    for (const auto& subobjeto : mensaje["objetos"]) {
+        if (!validarObjeto(subobjeto)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+bool validarObjeto(const json& objeto) {
+    if (!objeto.contains("tipo") || !objeto["tipo"].is_string()) {
+        cerr << "Error: La clave 'tipo' no está presente o no es de tipo string.\n";
+        return false;
+    }
+    if (objeto["tipo"] != "directorio" && objeto["tipo"] != "archivo"){
+        cerr << "Error: La clave 'tipo' no tiene el formato correcto.\n";
+        return false;
+    }
+
+    if (!objeto.contains("nombre") || !objeto["nombre"].is_string()) {
+        cerr << "Error: La clave 'nombre' no está presente o no es de tipo string.\n";
+        return false;
+    }
+
+    if (objeto["tipo"] == "directorio" && (!objeto.contains("objetos") || !objeto["objetos"].is_array())) {
+        cerr << "Error: La clave 'objetos' no está presente o no es de tipo array en un directorio.\n";
+        return false;
+    }
+
+    if (objeto["tipo"] == "archivo" && (!objeto.contains("contenido") || !objeto["contenido"].is_string())) {
+        cerr << "Error: La clave 'contenido' no está presente o no es de tipo string en un archivo.\n";
+        return false;
+    }
+
+    if (objeto["tipo"] == "archivo" && (!objeto.contains("permisos") || !objeto["permisos"].is_array())) {
+        cerr << "Error: La clave 'permisos' no está presente o no es de tipo array en un archivo.\n";
+        return false;
+    }
+
+    if (objeto["tipo"] == "directorio") {
+        for (const auto& subobjeto : objeto["objetos"]) {
+            if (!validarObjeto(subobjeto)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}

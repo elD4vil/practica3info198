@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <mutex>
 #include <chrono>
+#include <sys/stat.h>
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -29,5 +30,9 @@ void crearVariablesEntorno();
 string rutaNom(string pathNom);
 void printMenu(vector<int> opUsu, map<string, string> users, string user);
 vector<string> txtFile(const char* pathIn, const char* extension);
+bool validarExtension(string ext, string path);
+bool validarExistenciaArchivo(string path);
+bool validarFormatoMensaje(const json& mensaje);
+bool validarObjeto(const json& objeto);
 
 #endif

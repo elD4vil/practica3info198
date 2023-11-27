@@ -64,7 +64,9 @@ int main(int argc, char **argv){
 
     int opc;
     int preparar_datos = 0, crear_indice = 0;
-    string entrada;
+    string entrada, treePath;
+    json dirArJSON;
+
     cout << "-----------------------------" << endl;
 
     do{
@@ -137,10 +139,35 @@ int main(int argc, char **argv){
             }
         }
         else if(menu[opc] == "directorioArbol" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
+            
+            cout << "Ingrese archivo a procesar: ";
+            cin >> treePath;
+            cout << endl;
 
-            string directorioArbol = "gnome-terminal -- bash -c './procesos/directorioArbol/app; exec bash'";
-            system(directorioArbol.c_str());
+            treePath = "../files/" + treePath;
 
+            if(validarExistenciaArchivo(treePath)){
+                if(validarExtension("dit", treePath)){
+
+                    ifstream archivoStream(treePath);
+
+                    if (archivoStream.is_open()) {
+                        string dirArSTR((istreambuf_iterator<char>(archivoStream)), istreambuf_iterator<char>());                                        
+
+                        dirArJSON = json::parse(dirArSTR);
+
+                        if(validarFormatoMensaje(dirArJSON)){
+                            string directorioArbol = "./procesos/directorioArbol/app '" + dirArSTR + "'";
+                            system(directorioArbol.c_str());
+                        }
+
+                        archivoStream.close();
+                    } else {
+                        cerr << "No se pudo abrir el archivo." << endl;
+                    }
+
+                }
+            }
         }
         else if(menu[opc] == "directorioLista" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
 
@@ -179,6 +206,10 @@ int main(int argc, char **argv){
         printMenu(opcionesUsuario,usuarios,usuarioSeleccionado);
         cout << endl;
     }
+
+    string base = dirArJSON["dirBase"];
+    string comando = "rm -r " + base;
+    system(comando.c_str());
 
     cout << "\n--------------------" << endl;
     cout << "GRACIAS POR PREFERIR" << endl;

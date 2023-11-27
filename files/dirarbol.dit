@@ -1,26 +1,26 @@
 {
-"dirBase": "files/baseArbol/",
-"objetos":[
-    {
-    "tipo": "directorio",
-    "nombre": "dir1",
+    "dirBase": "../files/baseArbol/",
     "objetos":[
-        {"tipo": "archivo", "nombre": "file1", "contenido": "la la", "permisos":["escritura","lectura"]},
-        {"tipo": "archivo", "nombre": "file2", "contenido": "casa", "permisos":["lectura"]},
-        {"tipo": "archivo", "nombre": "file3", "contenido": "nnn ccc", "permisos":["escritura"]},
         {
-        "tipo": "directorio",
-        "nombre": "dir1.1",
-        "objetos":[
-            {"tipo": "archivo", "nombre": "file4", "contenido": "4 ccc", "permisos":["escritura"]}
-        ]
+            "tipo": "directorio",
+            "nombre": "dir1",
+            "objetos":[
+                {"tipo": "archivo", "nombre": "file1", "contenido": "la la", "permisos":["escritura","lectura"]},
+                {"tipo": "archivo", "nombre": "file2", "contenido": "casa", "permisos":["lectura"]},
+                {"tipo": "archivo", "nombre": "file3", "contenido": "nnn ccc", "permisos":["escritura"]},
+                {
+                    "tipo": "directorio",
+                    "nombre": "dir1.1",
+                    "objetos":[
+                        {"tipo": "archivo", "nombre": "file4", "contenido": "4 ccc", "permisos":["escritura"]}
+                    ]
+                }
+            ]
+        },
+        {
+            "tipo": "directorio",
+            "nombre": "dir2",
+            "objetos":[]
         }
     ]
-    },
-    {
-    "tipo": "directorio",
-    "nombre": "dir2",
-    "objetos":[]
-    }
-]
 }
