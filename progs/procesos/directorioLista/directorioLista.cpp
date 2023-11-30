@@ -6,13 +6,13 @@
 vector<string> obtenerDirs(const string& path);
 string obtenerDirBase(const string& path);
 bool validarArchivo(const string& path);
-void crearDirectorioBase(const string& dirbase, const map<string, vector<string>>& directoriosConArchivos);
+void crearDirectoriosConArchivos(const string& rutaBase, const map<string, vector<string>>& directoriosConArchivos);
 map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path);
-void crearEnlaceSimbolico(const std::string& origen, const std::string& destino);
+void crearEnlaceSimbolico(const string& origen, const string& destino);
 
 int main(int argc, char* argv[]){
     system("clear");
-    string texto;
+    string texto = "/home/benjaminc/info198/practica3info198/progs/procesos/directorioLista/basedatos.dre";
     cout << "Ingrese Path de archivo .dre: ";
     getline(cin, texto);
     bool archivoExiste = validarArchivo(texto);
@@ -25,14 +25,12 @@ int main(int argc, char* argv[]){
     vector<string> vectordeDirs = obtenerDirs(texto);
     map<string, vector<string>> directoriosConArchivos = obtenerDirectoriosConArchivos(texto);
     
-    crearDirectorioBase(obtenerdirBase, directoriosConArchivos);
+    crearDirectoriosConArchivos(obtenerdirBase, directoriosConArchivos);
 
-    std::string dirfinal = obtenerdirBase + "/" + vectordeDirs.back();
-    std::string dirinicial = obtenerdirBase + "/" + vectordeDirs.front(); 
-
-    // Crear enlace simbólico desde dir4 a dir1
-    crearEnlaceSimbolico(dirinicial, dirfinal + "/enlace_a_" + vectordeDirs.front());
-
+    string rutaActual = obtenerdirBase;
+    for (const auto& dirs: vectordeDirs) {
+        rutaActual = rutaActual + "/" + dirs;
+    }
 
 }
 
@@ -75,48 +73,45 @@ string obtenerDirBase(const string& path) {
     return dirbase;
 }
 
-void crearDirectorioBase(const string& dirbase, const map<string, vector<string>>& directoriosConArchivos) {
+void crearDirectoriosConArchivos(const string& rutaBase, const map<string, vector<string>>& directoriosConArchivos) {
     try {
-        // Crear el directorio base
-        fs::create_directory(dirbase);
+        string rutaActual = rutaBase;
 
-        // Crear subdirectorios dentro del directorio base
+        // Iterar sobre los directorios y sus archivos asociados
         for (const auto& [nombreDirectorio, archivos] : directoriosConArchivos) {
-            string rutaDirectorio = dirbase + "/" + nombreDirectorio;
+            // Crear directorio
+            rutaActual = rutaBase + "/" + nombreDirectorio;
+            fs::create_directory(rutaActual);
 
-            // Verificar si el directorio ya existe
-            if (!fs::exists(rutaDirectorio)) {
-                fs::create_directory(rutaDirectorio);
-
-                // Crear archivos en el directorio actual
-                for (const auto& archivo : archivos) {
-                    ofstream archivoStream(rutaDirectorio + "/" + archivo);
-                    archivoStream << "Contenido del archivo " << archivo << endl;
-                    archivoStream.close();
-                }
+            // Crear archivos dentro del directorio
+            for (const auto& nombreArchivo : archivos) {
+                string rutaArchivo = rutaActual + "/" + nombreArchivo;
+                ofstream archivoStream(rutaArchivo);
+                archivoStream.close();
             }
         }
 
-        // Crear enlace virtual del último al primer directorio
-        if (!directoriosConArchivos.empty()) {
-            string rutaEnlace = dirbase + "/" + directoriosConArchivos.rbegin()->first;
-            string rutaDestino = dirbase + "/" + directoriosConArchivos.begin()->first;
+        // Crear enlaces simbólicos entre directorios
+        auto it = directoriosConArchivos.begin();
+        auto itUltimo = prev(directoriosConArchivos.end());
 
-            // Verificar si el enlace simbólico ya existe
-            if (!fs::exists(rutaDestino)) {
-                fs::create_symlink(rutaEnlace, rutaDestino);
+        for (; it != directoriosConArchivos.end(); ++it) {
+            if (next(it) == directoriosConArchivos.end()) {
+                // Último directorio, crear enlace al primer directorio
+                string rutaUltimo = rutaBase + "/" + itUltimo->first;
+                string rutaPrimer = rutaBase + "/" + directoriosConArchivos.begin()->first;
+                fs::create_symlink(rutaPrimer, rutaUltimo + "/" + directoriosConArchivos.begin()->first);
+            } else {
+                // Crear enlace al directorio siguiente
+                string rutaSiguiente = rutaBase + "/" + next(it)->first;
+                fs::create_symlink(rutaSiguiente, rutaBase + "/" + it->first + "/" + next(it)->first);
             }
         }
-
-        cout << "Directorio base y subdirectorios creados con éxito." << endl;
     } catch (const fs::filesystem_error& e) {
-        cerr << "Error al crear directorio base: " << e.what() << endl;
+        cerr << "Error al crear directorios con archivos: " << e.what() << endl;
     }
-    string comandoTree = "tree " + dirbase;
-    system(comandoTree.c_str());
-
-    
 }
+
 
 vector<string> obtenerDirs(const string& path) {
     ifstream archivo(path);
@@ -172,12 +167,13 @@ map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path) {
     return directoriosConArchivos;
 }
 
-void crearEnlaceSimbolico(const std::string& origen, const std::string& destino) {
+void crearEnlaceSimbolico(const string& origen, const string& destino) {
     try {
         // Crear enlace simbólico
         fs::create_symlink(origen, destino);
-        std::cout << "Enlace simbólico creado: " << destino << " -> " << origen << std::endl;
+        cout << "Enlace simbólico creado: " << destino << " -> " << origen << endl;
     } catch (const fs::filesystem_error& e) {
-        std::cerr << "Error al crear el enlace simbólico: " << e.what() << std::endl;
+        cerr << "Error al crear el enlace simbólico: " << e.what() << endl;
     }
 }
+
