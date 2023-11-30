@@ -140,11 +140,11 @@ int main(int argc, char **argv){
         }
         else if(menu[opc] == "directorioArbol" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
             
-            cout << "Ingrese archivo a procesar: ";
+            cout << "Ingrese la ruta del archivo a procesar: ";
             cin >> treePath;
             cout << endl;
 
-            treePath = "../files/" + treePath;
+            // treePath = "../files/" + treePath;
 
             if(validarExistenciaArchivo(treePath)){
                 if(validarExtension("dit", treePath)){

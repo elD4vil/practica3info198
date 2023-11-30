@@ -46,7 +46,9 @@ int main(int argc, char* argv[]){
 
     string base = dirArJSON["dirBase"];
     string comando = "mkdir " + base;
-    system(comando.c_str());
+    int resultado = system(comando.c_str());
+
+    if(resultado != 0) return 1;
 
     crearArbolDirectorio(dirArJSON["objetos"], base);
 
