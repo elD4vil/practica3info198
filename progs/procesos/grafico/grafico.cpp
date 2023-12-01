@@ -1,19 +1,23 @@
 #include "../../funciones/funciones.h"
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 #define MAX_POINTS 100
+#define GRAPH_SIZE 380
+#define POINT_SIZE 10
 
 struct Point {
     int x;
     int y;
 };
 
-int main() {
+void scalePoint(Point *point, int windowSize, int graphSize) {
+    point->x = (point->x * (windowSize)) / graphSize;
+    point->y = (point->y * (windowSize )) / graphSize;
+}
+
+int main(int argc, char* argv[]){
+
+    const char* graphPath = argv[1];
+
     Display *display = XOpenDisplay(NULL);
     if (display == NULL) {
         fprintf(stderr, "No se puede abrir la pantalla\n");
@@ -26,7 +30,7 @@ int main() {
     unsigned long white = WhitePixel(display, screen);
     unsigned long black = BlackPixel(display, screen);
 
-    Window window = XCreateSimpleWindow(display, root, 10, 10, 500, 500, 1, black, white);
+    Window window = XCreateSimpleWindow(display, root, 10, 10, 510, 500, 1, black, white);
 
     XSelectInput(display, window, ExposureMask | KeyPressMask);
 
@@ -39,7 +43,7 @@ int main() {
     XSetWMProtocols(display, window, &WM_DELETE_WINDOW, 1);
 
     XFontStruct *font_info;
-    const char *font_name = "fixed";  // Cambié la fuente a "fixed"
+    const char *font_name = "10x20";  // Cambié la fuente a "fixed"
     font_info = XLoadQueryFont(display, font_name);
 
     if (!font_info) {
@@ -49,7 +53,7 @@ int main() {
 
     XSetFont(display, gc, font_info->fid);
 
-    FILE *file = fopen("grafico.gra", "r");
+    FILE *file = fopen(graphPath, "r");
     if (!file) {
         fprintf(stderr, "No se puede abrir el archivo\n");
         return 1;
@@ -67,27 +71,42 @@ int main() {
             sscanf(line, "titulo:\"%[^\"]\"", title);
         } else {
             sscanf(line, "x:%d,y:%d", &points[pointCount].x, &points[pointCount].y);
+            scalePoint(&points[pointCount], 1000, GRAPH_SIZE);
             pointCount++;
         }
     }
 
     fclose(file);
 
+    XSetLineAttributes(display, gc, 2, LineSolid, CapButt, JoinRound);
+
     while (1) {
         XNextEvent(display, &event);
 
         if (event.type == Expose) {
             // Dibujar plano cartesiano
-            XDrawLine(display, window, gc, 50, 450, 50, 50);
-            XDrawLine(display, window, gc, 50, 450, 450, 450);
+            XDrawLine(display, window, gc, 50, 70, 50, 70 + GRAPH_SIZE);
+            XDrawLine(display, window, gc, 50, 70 + GRAPH_SIZE, 50 + GRAPH_SIZE, 70 + GRAPH_SIZE);
+
+            XDrawString(display, window, gc, 50 + GRAPH_SIZE, 60 + GRAPH_SIZE + 10, "X = 100", 7);
+            XDrawString(display, window, gc, 18, 60, "Y == 100", 8);
 
             // Dibujar puntos y líneas
-            for (int i = 0; i < pointCount - 1; ++i) {
-                XDrawLine(display, window, gc, 50 + points[i].x, 450 - points[i].y, 50 + points[i + 1].x, 450 - points[i + 1].y);
+
+            for (int i = 0; i < pointCount; ++i) {
+                // Dibujar el punto
+                XFillArc(display, window, gc, 50 + points[i].x - POINT_SIZE / 2,
+                         70 + GRAPH_SIZE - points[i].y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE, 0, 360 * 64);
+
+                // Dibujar la línea al siguiente punto
+                if (i < pointCount - 1) {
+                    XDrawLine(display, window, gc, 50 + points[i].x, 70 + GRAPH_SIZE - points[i].y,
+                              50 + points[i + 1].x, 70 + GRAPH_SIZE - points[i + 1].y);
+                }
             }
 
             // Mostrar título
-            XDrawString(display, window, gc, 200, 30, title, strlen(title));
+            XDrawString(display, window, gc, 75, 50 - 10, title, strlen(title));
         }
 
         if (event.type == KeyPress) {

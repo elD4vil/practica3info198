@@ -184,6 +184,8 @@ void printMenu(vector<int> opUsu, map<string, string> users, string user){
             acc++;
         }
     }
+
+    file.close();
 }
 
 //##########################################################################
@@ -307,6 +309,7 @@ bool validarExistenciaArchivo(string path){
     return true;
 }
 
+//##########################################################################
 bool validarFormatoMensaje(const json& mensaje) {
 
     if (!mensaje.contains("dirBase") || !mensaje["dirBase"].is_string()) {
@@ -361,5 +364,69 @@ bool validarObjeto(const json& objeto) {
         }
     }
 
+    return true;
+}
+//##########################################################################
+
+bool validarArchivoGrafico(const string& graphPath){
+    ifstream file(graphPath);
+    string linea;
+    int acc, subAcc;
+    bool primera = true;
+
+    while(getline(file,linea)){
+        istringstream ss(linea);
+        string segmento;
+
+        if(primera){
+            acc = 0;
+            while(getline(ss,segmento,':')){
+                if(acc == 0){
+                    if(segmento != "titulo"){
+                        cout << "La primera línea no tiene formato 'titulo:<string>'" << endl;
+                        return false;
+                    }
+                }
+                acc++;
+            }
+            primera = false;
+
+        }else{
+            acc = 0;
+            while(getline(ss,segmento,',')){
+                istringstream sss(segmento);
+                string punto;
+
+                subAcc = 0;
+                while(getline(sss,punto,':')){
+                    // verificación coordenada
+                    if(subAcc == 0){
+                        if(acc == 0){
+                            if(punto != "x"){
+                                cout << "Existe un punto que no tiene coordenada 'x'" << endl;
+                                return false;
+                            }
+                        }else if(acc == 1){
+                            if(punto != "y"){
+                                cout << "Existe un punto que no tiene coordenada 'y'" << endl;
+                                return false;
+                            }
+                        }
+                    }
+                    // verificación punto
+                    else if(subAcc == 1){
+                        try{
+                            int valor = stoi(punto);
+                        }catch (const exception& e){
+                            cout << "Existe un punto que no tiene valor entero" << endl;
+                            return false;
+                        }
+                    }
+                    subAcc++;
+                }
+                acc++;
+            }
+        }
+    }
     return true;
 }

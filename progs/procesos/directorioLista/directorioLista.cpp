@@ -1,179 +1,159 @@
 #include "../../funciones/funciones.h"
 
-//  /home/benjaminc/info198/practica3info198/progs/procesos/directorioLista/basedatos.dre
+struct NodoDirectorio {
+    std::string nombre;
+    std::vector<std::string> archivos;
+    NodoDirectorio* siguiente;
 
+    NodoDirectorio(const std::string& nombre) : nombre(nombre), siguiente(nullptr) {}
+};
 
-vector<string> obtenerDirs(const string& path);
-string obtenerDirBase(const string& path);
-bool validarArchivo(const string& path);
-void crearDirectoriosConArchivos(const string& rutaBase, const map<string, vector<string>>& directoriosConArchivos);
-map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path);
-void crearEnlaceSimbolico(const string& origen, const string& destino);
+class DirectorioCircular {
+private:
+    NodoDirectorio* inicio;
+    fs::path base_path;
 
-int main(int argc, char* argv[]){
-    system("clear");
-    string texto = "/home/benjaminc/info198/practica3info198/progs/procesos/directorioLista/basedatos.dre";
-    cout << "Ingrese Path de archivo .dre: ";
-    getline(cin, texto);
-    bool archivoExiste = validarArchivo(texto);
-    while(archivoExiste == false){
-        cout << "Ingrese Path de archivo .dre: ";
-        getline(cin, texto);
-        archivoExiste = validarArchivo(texto);
-    }
-    string obtenerdirBase = obtenerDirBase(texto);
-    vector<string> vectordeDirs = obtenerDirs(texto);
-    map<string, vector<string>> directoriosConArchivos = obtenerDirectoriosConArchivos(texto);
-    
-    crearDirectoriosConArchivos(obtenerdirBase, directoriosConArchivos);
+public:
+    DirectorioCircular() : inicio(nullptr) {}
 
-    string rutaActual = obtenerdirBase;
-    for (const auto& dirs: vectordeDirs) {
-        rutaActual = rutaActual + "/" + dirs;
-    }
+    void agregarDirectorio(const std::string& nombre, const std::vector<std::string>& archivos) {
+        NodoDirectorio* nuevoDirectorio = new NodoDirectorio(nombre);
+        nuevoDirectorio->archivos = archivos;
 
-}
-
-
-bool validarArchivo(const string& path) {
-    // Validar existencia
-    ifstream archivo(path);
-    if (!archivo.good()) {
-        cerr << "Error: El archivo no existe." << endl;
-        return false;
-    }
-
-    // Validar extensión
-    if (path.find(".dre") == string::npos) {
-        cerr << "Error: Extensión de archivo incorrecta." << endl;
-        return false;
-    }
-
-    return true;
-}
-
-string obtenerDirBase(const string& path) {
-    ifstream archivo(path);
-    string linea;
-
-    string dirbase;
-
-    while (getline(archivo, linea)) {
-        istringstream iss(linea);
-        string clave, valor;
-        getline(iss, clave, '=');
-        getline(iss, valor);
-
-        if (clave == "dirbase") {
-            dirbase = valor;
-            break;  // Terminamos la búsqueda después de encontrar "dirbase"
-        }
-    }
-
-    return dirbase;
-}
-
-void crearDirectoriosConArchivos(const string& rutaBase, const map<string, vector<string>>& directoriosConArchivos) {
-    try {
-        string rutaActual = rutaBase;
-
-        // Iterar sobre los directorios y sus archivos asociados
-        for (const auto& [nombreDirectorio, archivos] : directoriosConArchivos) {
-            // Crear directorio
-            rutaActual = rutaBase + "/" + nombreDirectorio;
-            fs::create_directory(rutaActual);
-
-            // Crear archivos dentro del directorio
-            for (const auto& nombreArchivo : archivos) {
-                string rutaArchivo = rutaActual + "/" + nombreArchivo;
-                ofstream archivoStream(rutaArchivo);
-                archivoStream.close();
+        if (inicio == nullptr) {
+            inicio = nuevoDirectorio;
+            inicio->siguiente = inicio; 
+        } else {
+            NodoDirectorio* temp = inicio;
+            while (temp->siguiente != inicio) {
+                temp = temp->siguiente;
             }
+            temp->siguiente = nuevoDirectorio; 
+            nuevoDirectorio->siguiente = inicio; 
+        }
+    }
+
+    void crearJerarquiaDirectorios() {
+    NodoDirectorio* temp = inicio; 
+    fs::path dir_path = base_path;
+    if (!fs::exists(dir_path)) {
+        fs::create_directories(dir_path); // Crea la ruta base si no existe
+    }
+    do {
+        dir_path /= temp->nombre; 
+
+        if (fs::exists(dir_path)) {
+            std::cout << dir_path << std::endl;
+            fs::remove_all(dir_path); // Elimina el directorio si ya existe
+        }
+        fs::create_directory(dir_path); 
+
+        for (const auto& archivo : temp->archivos) {
+            std::ofstream ofs(dir_path / archivo);
+            ofs.close();
         }
 
-        // Crear enlaces simbólicos entre directorios
-        auto it = directoriosConArchivos.begin();
-        auto itUltimo = prev(directoriosConArchivos.end());
+        temp = temp->siguiente; 
+    } while (temp != inicio);
 
-        for (; it != directoriosConArchivos.end(); ++it) {
-            if (next(it) == directoriosConArchivos.end()) {
-                // Último directorio, crear enlace al primer directorio
-                string rutaUltimo = rutaBase + "/" + itUltimo->first;
-                string rutaPrimer = rutaBase + "/" + directoriosConArchivos.begin()->first;
-                fs::create_symlink(rutaPrimer, rutaUltimo + "/" + directoriosConArchivos.begin()->first);
+    // Crear el enlace simbólico en el último directorio
+    fs::path link_path = dir_path / inicio->nombre; 
+    if (fs::exists(link_path)) {
+        fs::remove(link_path); // Elimina el enlace si ya existe
+    }
+    fs::create_directory_symlink(base_path / inicio->nombre, link_path);
+}
+
+
+
+    void mostrarDirectorios() {
+        if (inicio == nullptr) {
+            std::cout << "El directorio está vacío." << std::endl;
+            return;
+        }
+
+        NodoDirectorio* temp = inicio;
+        do {
+            std::cout << temp->nombre << std::endl;
+            temp = temp->siguiente;
+        } while (temp != inicio);
+    }
+
+    void leerArchivo(const std::string& path) {
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            std::cout << "No se pudo abrir el archivo." << std::endl;
+            return;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            std::istringstream iss(line);
+            std::string key;
+            std::getline(iss, key, '=');
+            std::string value;
+            std::getline(iss, value);
+
+            if (key == "dirbase") {
+                base_path = value;
+            } else if (key == "dirs") {
+                std::istringstream iss_dirs(value);
+                std::string dir;
+                while (std::getline(iss_dirs, dir, ';')) {
+                    agregarDirectorio(dir, {});
+                }
             } else {
-                // Crear enlace al directorio siguiente
-                string rutaSiguiente = rutaBase + "/" + next(it)->first;
-                fs::create_symlink(rutaSiguiente, rutaBase + "/" + it->first + "/" + next(it)->first);
+                NodoDirectorio* temp = inicio;
+                do {
+                    if (temp->nombre == key) {
+                        std::istringstream iss_files(value);
+                        std::string file;
+                        while (std::getline(iss_files, file, ';')) {
+                            temp->archivos.push_back(file);
+                        }
+                        break;
+                    }
+                    temp = temp->siguiente;
+                } while (temp != inicio);
             }
         }
-    } catch (const fs::filesystem_error& e) {
-        cerr << "Error al crear directorios con archivos: " << e.what() << endl;
+
+        file.close();
     }
-}
-
-
-vector<string> obtenerDirs(const string& path) {
-    ifstream archivo(path);
-    string linea;
-
-    vector<string> dirs;
-
-    while (getline(archivo, linea)) {
-        istringstream iss(linea);
-        string clave, valor;
-        getline(iss, clave, '=');
-        getline(iss, valor);
-
-        if (clave == "dirs") {
-            istringstream dirsStream(valor);
-            string dir;
-            while (getline(dirsStream, dir, ';')) {
-                dirs.push_back(dir);
-            }
-            break;  // Terminamos la búsqueda después de encontrar "dirs"
+    void recorrerNodos() {
+        if (inicio == nullptr) {
+            std::cout << "La lista está vacía." << std::endl;
+            return;
         }
-    }
 
-    return dirs;
-}
-
-
-map<string, vector<string>> obtenerDirectoriosConArchivos(const string& path) {
-    ifstream archivo(path);
-    string linea;
-
-    map<string, vector<string>> directoriosConArchivos;
-
-    while (getline(archivo, linea)) {
-        istringstream iss(linea);
-        string clave, valor;
-        getline(iss, clave, '=');
-        getline(iss, valor);
-
-        if (clave.substr(0, 3) == "dir" && isdigit(clave.back())) { // Verificar si el último carácter es un número
-            istringstream archivosStream(valor);
-            string archivo;
-            string nombreDirectorio = clave;
-            vector<string> archivos;
-            while (getline(archivosStream, archivo, ';')) {
-                archivos.push_back(archivo);
+        NodoDirectorio* temp = inicio;
+        do {
+            std::cout << "Directorio: " << temp->nombre << std::endl;
+            std::cout << "Archivos: ";
+            for (const auto& archivo : temp->archivos) {
+                std::cout << archivo << " ";
             }
-
-            directoriosConArchivos[nombreDirectorio] = archivos;
-        }
+            std::cout << std::endl;
+            temp = temp->siguiente;
+        } while (temp != inicio);
     }
 
-    return directoriosConArchivos;
-}
+};
 
-void crearEnlaceSimbolico(const string& origen, const string& destino) {
-    try {
-        // Crear enlace simbólico
-        fs::create_symlink(origen, destino);
-        cout << "Enlace simbólico creado: " << destino << " -> " << origen << endl;
-    } catch (const fs::filesystem_error& e) {
-        cerr << "Error al crear el enlace simbólico: " << e.what() << endl;
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "Uso: " << argv[0] << " path \n";
+        return 1;
     }
-}
+    string path = argv[1];
+    cout<<path<<endl;
+    DirectorioCircular directorio;
 
+    directorio.leerArchivo(path);
+    directorio.crearJerarquiaDirectorios();
+
+    std::cout << "Contenido del directorio:" << std::endl;
+    directorio.mostrarDirectorios();
+    directorio.recorrerNodos();
+    return 0;
+}

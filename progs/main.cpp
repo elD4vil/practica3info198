@@ -64,7 +64,7 @@ int main(int argc, char **argv){
 
     int opc;
     int preparar_datos = 0, crear_indice = 0;
-    string entrada, treePath;
+    string entrada, treePath, listPath, graphPath;
     json dirArJSON;
 
     cout << "-----------------------------" << endl;
@@ -140,11 +140,9 @@ int main(int argc, char **argv){
         }
         else if(menu[opc] == "directorioArbol" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
             
-            cout << "Ingrese la ruta del archivo a procesar: ";
+            cout << "Ingrese la ruta del archivo a procesar en base a un árbol jerárquico: ";
             cin >> treePath;
             cout << endl;
-
-            // treePath = "../files/" + treePath;
 
             if(validarExistenciaArchivo(treePath)){
                 if(validarExtension("dit", treePath)){
@@ -171,15 +169,36 @@ int main(int argc, char **argv){
         }
         else if(menu[opc] == "directorioLista" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
 
-            string directorioLista = "./procesos/directorioLista/app ";
-            system(directorioLista.c_str());
+            cout << "Ingrese la ruta del archivo a procesar en base a una lista circular: ";
+            cin >> listPath;
+            cout << endl;
+
+            if(validarExistenciaArchivo(listPath)){
+                if(validarExtension("dre", listPath)){
+
+                    string directorioLista = "./procesos/directorioLista/app " + listPath;
+                    system(directorioLista.c_str());
+
+                }
+            }
+
 
         }
         else if(menu[opc] == "grafico" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
 
-            string procesamientoGrafico = "./procesos/grafico/app ";
-            system(procesamientoGrafico.c_str());
+            cout << "Ingrese la ruta del archivo a graficar: ";
+            cin >> graphPath;
+            cout << endl;
 
+            if(validarExistenciaArchivo(graphPath)){
+                if(validarExtension("gra", graphPath)){
+                    if(validarArchivoGrafico(graphPath)){
+                        string procesamientoGrafico = "./procesos/grafico/app " + graphPath;
+                        system(procesamientoGrafico.c_str());
+                    }
+
+                }
+            }
         }
 
         else if(opc<0 || opc>menusize) cout << "Opción fuera de rango" << endl;
@@ -207,9 +226,9 @@ int main(int argc, char **argv){
         cout << endl;
     }
 
-    string base = dirArJSON["dirBase"];
-    string comando = "rm -r " + base;
-    system(comando.c_str());
+    // string base = dirArJSON["dirBase"];
+    // string comando = "rm -r " + base;
+    // system(comando.c_str());
 
     cout << "\n--------------------" << endl;
     cout << "GRACIAS POR PREFERIR" << endl;

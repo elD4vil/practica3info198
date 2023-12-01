@@ -12,10 +12,15 @@
 #include <filesystem>
 #include <unistd.h>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <algorithm>
 #include <mutex>
 #include <chrono>
 #include <sys/stat.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -34,5 +39,6 @@ bool validarExtension(string ext, string path);
 bool validarExistenciaArchivo(string path);
 bool validarFormatoMensaje(const json& mensaje);
 bool validarObjeto(const json& objeto);
+bool validarArchivoGrafico(const string& graphPath);
 
 #endif
