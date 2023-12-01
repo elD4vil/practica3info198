@@ -61,8 +61,6 @@ void agregarArchivosaDirectorios(const string& rutaBase, const vector<string>& d
             }
         }
 
-        cout << rutaActual << dirs.front() << endl;
-
         string comandoLn = "ln -s " + rutaBase + "/" + dirs.front() + " " + rutaActual;
         system(comandoLn.c_str());
 

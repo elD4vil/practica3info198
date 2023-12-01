@@ -40,5 +40,6 @@ bool validarExistenciaArchivo(string path);
 bool validarFormatoMensaje(const json& mensaje);
 bool validarObjeto(const json& objeto);
 bool validarArchivoGrafico(const string& graphPath);
+bool validarFormatoLista(const string& listPath);
 
 #endif

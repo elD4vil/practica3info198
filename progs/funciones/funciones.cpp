@@ -366,8 +366,8 @@ bool validarObjeto(const json& objeto) {
 
     return true;
 }
-//##########################################################################
 
+//##########################################################################
 bool validarArchivoGrafico(const string& graphPath){
     ifstream file(graphPath);
     string linea;
@@ -430,3 +430,43 @@ bool validarArchivoGrafico(const string& graphPath){
     }
     return true;
 }
+
+//##########################################################################
+bool validarFormatoLista(const string& listPath){
+    ifstream file(listPath);
+    string linea;
+    bool primera = true;
+    bool segunda = true;
+
+    while(getline(file,linea)){
+        istringstream ss(linea);
+        string segmento;
+
+        int acc = 0;
+        while(getline(ss,segmento,'=')){
+            if(primera){
+                if(acc == 0){
+                    if(segmento != "dirbase"){
+                        cout << "El archivo .dre no tiene el formato correcto en dirbase." << endl;
+                        return false;
+                    }
+                    primera = false;
+                }
+                
+            }else if(segunda){
+                if(acc == 0){
+                    cout << segmento << endl;
+                    if(segmento != "dirs"){
+                        cout << "El archivo .dre no tiene el formato correcto en dirs." << endl;
+                        return false;
+                    }
+                    segunda = false;
+                }
+            }
+            acc++;
+        }
+    }
+
+    return true;
+}
+

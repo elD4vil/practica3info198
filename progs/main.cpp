@@ -177,15 +177,13 @@ int main(int argc, char **argv){
 
             if(validarExistenciaArchivo(listPath)){
                 if(validarExtension("dre", listPath)){
-
-                    string procesoLista = getenv("PROCESO_LISTA");
-                    string directorioLista = procesoLista + " " + listPath;
-                    system(directorioLista.c_str());
-
+                    if(validarFormatoLista(listPath)){
+                        string procesoLista = getenv("PROCESO_LISTA");
+                        string directorioLista = procesoLista + " " + listPath;
+                        system(directorioLista.c_str());
+                    }
                 }
             }
-
-
         }
         else if(menu[opc] == "grafico" && find(opcionesUsuario.begin(), opcionesUsuario.end(), opc) != opcionesUsuario.end()){
 
