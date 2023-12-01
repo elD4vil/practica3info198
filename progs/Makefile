@@ -18,7 +18,7 @@ BUSCADOR_EXECUTABLE = procesos/buscador/app
 
 ARBOL_SOURCES = procesos/directorioArbol/directorioArbol.cpp funciones/funciones.cpp
 ARBOL_HEADERS = funciones/funciones.h
-ARBOL_EXECUTABLE = procesos/directorioArbol/app
+ARBOL_EXECUTABLE = procesos/directorioArbol/hola
 
 LISTA_SOURCES = procesos/directorioLista/directorioLista.cpp funciones/funciones.cpp
 LISTA_HEADERS = funciones/funciones.h

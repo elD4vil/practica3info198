@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
     XSetWMProtocols(display, window, &WM_DELETE_WINDOW, 1);
 
     XFontStruct *font_info;
-    const char *font_name = "10x20";  // Cambié la fuente a "fixed"
+    const char *font_name = "10x20";
     font_info = XLoadQueryFont(display, font_name);
 
     if (!font_info) {
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]){
                          70 + GRAPH_SIZE - points[i].y - POINT_SIZE / 2, POINT_SIZE, POINT_SIZE, 0, 360 * 64);
 
                 // Dibujar la línea al siguiente punto
-                if (i < pointCount - 1) {
+                if (i < pointCount) {
                     XDrawLine(display, window, gc, 50 + points[i].x, 70 + GRAPH_SIZE - points[i].y,
                               50 + points[i + 1].x, 70 + GRAPH_SIZE - points[i + 1].y);
                 }

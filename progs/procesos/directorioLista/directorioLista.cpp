@@ -43,10 +43,10 @@ string obtenerDirBase(const string& path) {
 
 
 void agregarArchivosaDirectorios(const string& rutaBase, const vector<string>& dirs, const map<string, vector<string>>& archivosPorDirectorio) {
-    string rutaActual = rutaBase;
     try {
+        string rutaActual = rutaBase;
         for (const auto& dir : dirs) {
-            rutaActual = rutaBase + "/" + dir;
+            rutaActual = rutaActual + "/" + dir;
             if (fs::exists(rutaActual)) {
                 fs::remove_all(rutaActual); 
             }
@@ -61,7 +61,9 @@ void agregarArchivosaDirectorios(const string& rutaBase, const vector<string>& d
             }
         }
 
-        string comandoLn = "ln -s " + rutaBase + "/" + dirs.front() + " " + rutaBase + "/" + dirs.back();
+        cout << rutaActual << dirs.front() << endl;
+
+        string comandoLn = "ln -s " + rutaBase + "/" + dirs.front() + " " + rutaActual;
         system(comandoLn.c_str());
 
     } catch (const fs::filesystem_error& e) {

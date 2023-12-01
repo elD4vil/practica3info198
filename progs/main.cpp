@@ -155,7 +155,9 @@ int main(int argc, char **argv){
                         dirArJSON = json::parse(dirArSTR);
 
                         if(validarFormatoMensaje(dirArJSON)){
-                            string directorioArbol = "./procesos/directorioArbol/app '" + dirArSTR + "'";
+
+                            string procesoArbol = getenv("PROCESO_ARBOL");
+                            string directorioArbol = procesoArbol + " '" + dirArSTR + "'";
                             system(directorioArbol.c_str());
                         }
 
@@ -176,7 +178,8 @@ int main(int argc, char **argv){
             if(validarExistenciaArchivo(listPath)){
                 if(validarExtension("dre", listPath)){
 
-                    string directorioLista = "./procesos/directorioLista/app " + listPath;
+                    string procesoLista = getenv("PROCESO_LISTA");
+                    string directorioLista = procesoLista + " " + listPath;
                     system(directorioLista.c_str());
 
                 }
@@ -193,7 +196,9 @@ int main(int argc, char **argv){
             if(validarExistenciaArchivo(graphPath)){
                 if(validarExtension("gra", graphPath)){
                     if(validarArchivoGrafico(graphPath)){
-                        string procesamientoGrafico = "./procesos/grafico/app " + graphPath;
+
+                        string procesoGrafico = getenv("PROCESO_GRAFICO");
+                        string procesamientoGrafico = procesoGrafico + " " + graphPath;
                         system(procesamientoGrafico.c_str());
                     }
 
