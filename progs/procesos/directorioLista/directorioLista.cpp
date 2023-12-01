@@ -11,10 +11,13 @@ int main(int argc, char* argv[]){
     string texto = argv[1];
 
     string obtenerdirBase = obtenerDirBase(texto);
+    fs::create_directory(obtenerdirBase);
     vector<string> vectordeDirs = obtenerDirs(texto);
     map<string, vector<string>> directoriosConArchivos = obtenerDirectoriosConArchivos(texto);
 
     agregarArchivosaDirectorios(obtenerdirBase,vectordeDirs,directoriosConArchivos);
+
+    cout << "Sistema de directorio basado en lista circular creado exitosamente con directorio base en " << obtenerdirBase << endl;
 }
 
 string obtenerDirBase(const string& path) {

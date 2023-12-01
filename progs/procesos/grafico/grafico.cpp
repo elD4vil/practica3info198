@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
             sscanf(line, "titulo:\"%[^\"]\"", title);
         } else {
             sscanf(line, "x:%d,y:%d", &points[pointCount].x, &points[pointCount].y);
-            scalePoint(&points[pointCount], 1000, GRAPH_SIZE);
+            scalePoint(&points[pointCount], 1500, GRAPH_SIZE);
             pointCount++;
         }
     }
@@ -89,7 +89,7 @@ int main(int argc, char* argv[]){
             XDrawLine(display, window, gc, 50, 70 + GRAPH_SIZE, 50 + GRAPH_SIZE, 70 + GRAPH_SIZE);
 
             XDrawString(display, window, gc, 50 + GRAPH_SIZE, 60 + GRAPH_SIZE + 10, "X = 100", 7);
-            XDrawString(display, window, gc, 18, 60, "Y == 100", 8);
+            XDrawString(display, window, gc, 18, 60, "Y = 100", 8);
 
             // Dibujar puntos y líneas
 
